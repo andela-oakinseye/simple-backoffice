@@ -34,3 +34,6 @@ Simple backoffice server
   "amount": 10
 }
 ```
+
+### WS route for exchange backoffice communication
+`ws://localhost:3000/exchange`

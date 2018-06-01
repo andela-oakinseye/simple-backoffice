@@ -2,6 +2,7 @@ import crc32 from 'crc-32';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
+import expressWs from 'express-ws';
 
 import logger from 'util';
 
@@ -10,6 +11,8 @@ import Wallet from './models/Wallet';
 
 
 const app = express();
+const ws = expressWs(app);
+
 dotenv.config();
 
 app.use(express.json());
@@ -177,11 +180,14 @@ app.post('/deposit/:userID', (request, response) => {
  * Withdraw fund from a user's wallet
  * No checks to confirm the user has the balance
  * This code is just for testing purpose
+ * We also need to talk to core so the user does not have any reserved balance
  */
 
 app.post('/withdraw/:userID', (request, response) => {
   const user_id  = request.params.userID;
   const { currency, amount } = request.body;
+
+  // Connect to Core and check if user has reserved margin before you allow withdrawal.
 
   return Wallet.findOneAndUpdate(
     { user_id, currency }, 
@@ -202,6 +208,17 @@ app.post('/withdraw/:userID', (request, response) => {
           error: error.message
         })
     })
+});
+
+
+app.ws('/exchange', (ws, request) => {
+  ws.on('message', (message) => {
+    /**
+     * process the exchange here incrementing and decrementing balances as necessary
+     * Send acknowledgement to the middle layer so it can free up reserve and request new balance
+     */
+    logger.log(message);
+  });
 });
 
 app.listen(PORT, cb => logger.log(`Running on ${PORT}`))
