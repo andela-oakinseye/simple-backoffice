@@ -1,0 +1,30 @@
+{
+  "name": "simple-backoffice",
+  "version": "1.0.0",
+  "description": "Simple backoffice server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "babel-watch server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andela-oakinseye/simple-backoffice.git"
+  },
+  "keywords": [],
+  "author": "Olawale Akinseye <brainyfarm@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andela-oakinseye/simple-backoffice/issues"
+  },
+  "homepage": "https://github.com/andela-oakinseye/simple-backoffice#readme",
+  "dependencies": {
+    "crc-32": "^1.2.0",
+    "express": "^4.16.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-watch": "^2.0.7"
+  }
+}
