@@ -45,9 +45,11 @@ Simple backoffice server
 **POST** `localhost:3000/exchange`
 ```json
 {
-  "exchange": "{ exchangeUserData1: { userID: 'USER_001', orderID: 'ORDER_015, currency: 'BTC', qty: 1.2, }, exchangeUserData2: { userID: 'USER_002', orderID: 'ORDER_019', currency: 'USD', qty: 9000, } }"
+  "exchange": { "exchangeUserData1": { "userID": "5b112b79ded7f95f87f84bef", "orderID": "ORDER_015", "currency": "BTC", "qty": "10" }, "exchangeUserData2": { "userID": "5b1108ae079f425343c715b8", "orderID": "ORDER_019", "currency": "USD", "qty": "9000" } }
 }
 ```
+
+
 
 ### WS route for exchange backoffice communication
 `ws://localhost:3000/exchange`

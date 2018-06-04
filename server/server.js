@@ -230,6 +230,7 @@ app.post('/withdraw/:userID', (request, response) => {
 });
 
 app.post('/exchange', (request, response) => {
+  console.log(request.body.exchange);
   const exchangeData = JSON.parse(request.body.exchange);
   const firstUserData = exchangeData.exchangeUserData1;
   const secondUserData = exchangeData.exchangeUserData2;
@@ -260,7 +261,7 @@ app.post('/exchange', (request, response) => {
           // Exchange acknowledgment should contain the amount to be freed up in margin?
           const exchangeAck = {
             success: true,
-            creditInfo: {
+            clearMargin: {
               user1: {
                 userID: firstUserData.userID,
                 currency: secondUserData.currency,
@@ -278,10 +279,7 @@ app.post('/exchange', (request, response) => {
           logger.log(`Exchange Completed ${exchangeAck}`);
 
           return response.status(200)
-            .json({
-              success: true,
-              message: "Exchange completed successfully"
-            })
+            .json(exchangeAck)
         })
         .catch((error) => {
           return response.status(500)
