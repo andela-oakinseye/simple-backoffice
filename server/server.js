@@ -1,6 +1,7 @@
 import crc32 from 'crc-32';
 import dotenv from 'dotenv';
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import expressWs from 'express-ws';
 
@@ -25,6 +26,7 @@ mongoose.Promise = global.Promise;
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
+const JWT_SECRET = process.env.JWT_SECRET;
 const CHECKSUM_SEED = process.env.CHECKSUM_SEED;
 
 mongoose.connect(
@@ -62,10 +64,16 @@ app.post('/user', (request, response) => {
     .then((user) => {
       return Wallet.insertMany(userWallets)
         .then((wallets) => {
+          const tokenPayload = {
+            "id": user._id,
+            "username": `${user._id}@simplebackoffice.com`
+          }
+          const token = jwt.sign(tokenPayload, JWT_SECRET);
           return response.status(200)
             .json({
               success: true,
               user: user,
+              token,
               wallets,
             })
         })
@@ -77,6 +85,27 @@ app.post('/user', (request, response) => {
           error: error.message
         });
     })
+});
+
+/**
+ * Decode a token passed via query string
+ */
+app.get('/backend/jwtDecode', (request, response) => {
+  const token = request.query.token;
+  try {
+    const data = jwt.verify(token, JWT_SECRET);
+
+    return response.status(200)
+      .json({
+        data
+      });
+  } catch(e) {
+    return response.status(401)
+      .json({
+        data: {},
+        error: 'Invalid token'
+      })
+  }
 });
 
 /**
