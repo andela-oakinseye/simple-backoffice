@@ -8,6 +8,12 @@ Simple backoffice server
 
 ## Create a User
 **POST** `localhost:3000/user`
+```json
+{
+  "firstname": "Olawale",
+  "lastname": "Akinseye"
+}
+```
 
 ## Get all Balances
 **GET** `localhost:3000/balances`
@@ -26,7 +32,7 @@ Simple backoffice server
 ```
 
 
-### Withdraw funds from User's Wallet
+## Withdraw funds from User's Wallet
 **POST** `localhost:3000/withdraw/<USER_ID>`
 ```json
 {
@@ -35,7 +41,7 @@ Simple backoffice server
 }
 ```
 
-### Process acknowledgment message of an exchange from core ms
+## Process acknowledgment message of an exchange from core ms
 **POST** `localhost:3000/exchange`
 ```json
 {
