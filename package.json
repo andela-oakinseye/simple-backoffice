@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/andela-oakinseye/simple-backoffice#readme",
   "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-watch": "^2.0.7",
     "crc-32": "^1.2.0",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",

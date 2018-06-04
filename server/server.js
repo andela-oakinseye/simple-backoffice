@@ -117,35 +117,35 @@ app.get('/balances', (request, response) => {
  */
 app.get('/balances/checksum', (request, response) => {
   return Wallet.find({}, 'user_id balance currency').exec()
-  .then((wallets) => {
-    const balances = {};
-    // I know this is a bad idea but just for the sake of this test
-    wallets.forEach((wallet) => {
-      const user_id = wallet.user_id;
-      const currency = wallet.currency;
-      const balance = wallet.balance;
-      if (user_id in balances) {
-        balances[user_id][currency] = balance;
-      } else {
-        balances[user_id] = {
-          [currency]: balance
-        };
-      }
-    });
-
-    return response.status(200)
-      .json({
-        success: true,
-        checksum: crc32.str(JSON.stringify(balances), CHECKSUM_SEED)
+    .then((wallets) => {
+      const balances = {};
+      // I know this is a bad idea but just for the sake of this test
+      wallets.forEach((wallet) => {
+        const user_id = wallet.user_id;
+        const currency = wallet.currency;
+        const balance = wallet.balance;
+        if (user_id in balances) {
+          balances[user_id][currency] = balance;
+        } else {
+          balances[user_id] = {
+            [currency]: balance
+          };
+        }
       });
-  })
-  .catch((error) => {
-    return response.status(500)
-      .json({
-        success: false,
-        error: error.message,
-      })
-  });
+
+      return response.status(200)
+        .json({
+          success: true,
+          checksum: crc32.str(JSON.stringify(balances), CHECKSUM_SEED)
+        });
+    })
+    .catch((error) => {
+      return response.status(500)
+        .json({
+          success: false,
+          error: error.message,
+        })
+    });
 });
 
 /**
@@ -153,12 +153,22 @@ app.get('/balances/checksum', (request, response) => {
  */
 
 app.post('/deposit/:userID', (request, response) => {
-  const user_id  = request.params.userID;
-  const { currency, amount } = request.body;
+  const user_id = request.params.userID;
+  const {
+    currency,
+    amount
+  } = request.body;
 
-  return Wallet.findOneAndUpdate(
-    { user_id, currency }, 
-    { $inc: { balance: Number(amount) } }, { new: true }).exec()
+  return Wallet.findOneAndUpdate({
+      user_id,
+      currency
+    }, {
+      $inc: {
+        balance: Number(amount)
+      }
+    }, {
+      new: true
+    }).exec()
     .then((wallet) => {
       // Here, we should send new balance object to the middle layer here so it is updated.
       return response.status(200)
@@ -184,16 +194,25 @@ app.post('/deposit/:userID', (request, response) => {
  */
 
 app.post('/withdraw/:userID', (request, response) => {
-  const user_id  = request.params.userID;
-  const { currency, amount } = request.body;
+  const user_id = request.params.userID;
+  const {
+    currency,
+    amount
+  } = request.body;
 
   // Connect to Core and check if user has reserved margin before you allow withdrawal.
 
-  return Wallet.findOneAndUpdate(
-    { user_id, currency }, 
-    { $inc: { balance: Number(-amount)} }, { new: true }).exec()
+  return Wallet.findOneAndUpdate({
+      user_id,
+      currency
+    }, {
+      $inc: {
+        balance: Number(-amount)
+      }
+    }, {
+      new: true
+    }).exec()
     .then((wallet) => {
-
       // We should send new balance object to the middle layer here so it is updated.
       return response.status(200)
         .json({
@@ -210,7 +229,73 @@ app.post('/withdraw/:userID', (request, response) => {
     })
 });
 
+app.post('/exchange', (request, response) => {
+  const exchangeData = JSON.parse(request.body.exchange);
+  const firstUserData = exchangeData.exchangeUserData1;
+  const secondUserData = exchangeData.exchangeUserData2;
 
+  /** Increment the first user's balance */
+  return Wallet.findOneAndUpdate({
+      user_id: firstUserData.userID,
+      currency: firstUserData.currency
+    }, {
+      $inc: {
+        balance: Number(firstUserData.qty)
+      }
+    }, {
+      new: true
+    }).exec()
+    .then((user1balance) => {
+      /** Increment the second user's balance */
+      return Wallet.findOneAndUpdate({
+          user_id: secondUserData.userID,
+          currency: firstUserData.currency
+        }, {
+          $inc: {
+            balance: Number(secondUserData.qty)
+          }
+        }).exec()
+        // Send the acknowledgement message here so we free up the margin since user has been credited? 
+        .then((user2balance) => {
+          // Exchange acknowledgment should contain the amount to be freed up in margin?
+          const exchangeAck = {
+            success: true,
+            creditInfo: {
+              user1: {
+                userID: firstUserData.userID,
+                currency: secondUserData.currency,
+                qty: secondUserData.qty
+              },
+              user2: {
+                userID: secondUserData.userID,
+                currency: firstUserData.currency,
+                qty: firstUserData.qty
+              }
+            }
+          }
+
+          // Connect to Core here and send creditInfo so it knows.
+          logger.log(`Exchange Completed ${exchangeAck}`);
+
+          return response.status(200)
+            .json({
+              success: true,
+              message: "Exchange completed successfully"
+            })
+        })
+        .catch((error) => {
+          return response.status(500)
+            .json({
+              success: false,
+              error: error.message
+            })
+        });
+    })
+});
+
+/**
+ * Will be fully implemented when we move to websocket.
+ */
 app.ws('/exchange', (ws, request) => {
   ws.on('message', (message) => {
     /**
@@ -220,5 +305,6 @@ app.ws('/exchange', (ws, request) => {
     logger.log(message);
   });
 });
+
 
 app.listen(PORT, cb => logger.log(`Running on ${PORT}`))

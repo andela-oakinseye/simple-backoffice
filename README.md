@@ -35,5 +35,13 @@ Simple backoffice server
 }
 ```
 
+### Process acknowledgment message of an exchange from core ms
+**POST** `localhost:3000/exchange`
+```json
+{
+  "exchange": "{ exchangeUserData1: { userID: 'USER_001', orderID: 'ORDER_015, currency: 'BTC', qty: 1.2, }, exchangeUserData2: { userID: 'USER_002', orderID: 'ORDER_019', currency: 'USD', qty: 9000, } }"
+}
+```
+
 ### WS route for exchange backoffice communication
 `ws://localhost:3000/exchange`
