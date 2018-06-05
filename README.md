@@ -67,8 +67,9 @@ Simple backoffice server
 ```
 
 
-## Get all Balances Pass
+## Get all Balances
 **GET** `simplebackoffice-env.kvus2ffkxa.eu-west-2.elasticbeanstalk.com/balances`
+
 **GET** `simplebackoffice-env.kvus2ffkxa.eu-west-2.elasticbeanstalk.com/balances?checksum=127928282`
 
 **Response**
