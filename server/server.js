@@ -99,7 +99,7 @@ app.get('/backend/jwtDecode', (request, response) => {
       .json({
         data
       });
-  } catch(e) {
+  } catch (e) {
     return response.status(401)
       .json({
         data: {},
@@ -112,6 +112,7 @@ app.get('/backend/jwtDecode', (request, response) => {
  * Get all balances
  */
 app.get('/balances', (request, response) => {
+  const checksum = request.query.checksum;
   return Wallet.find({}, 'user_id balance currency').exec()
     .then((wallets) => {
       const balances = {};
@@ -129,8 +130,24 @@ app.get('/balances', (request, response) => {
         }
       });
 
-      return response.status(200)
-        .json(balances);
+      const formattedBalances = Object.keys(balances).map((user_id) => {
+        return [
+          user_id,
+          balances[user_id]
+        ]
+      });
+
+      const balanceChecksum = crc32.str(JSON.stringify(formattedBalances), CHECKSUM_SEED);
+
+      /** Don't send the balance object if checksum is the same */
+      return !checksum || Number(checksum) != balanceChecksum ?
+        response.status(200)
+          .json({
+            checksum: balanceChecksum,
+            balance: formattedBalances
+          }) : 
+          response.status(304)
+            .json()
     })
     .catch((error) => {
       return response.status(500)

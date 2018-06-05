@@ -67,26 +67,37 @@ Simple backoffice server
 ```
 
 
-## Get all Balances
+## Get all Balances Pass
 **GET** `simplebackoffice-env.kvus2ffkxa.eu-west-2.elasticbeanstalk.com/balances`
+**GET** `simplebackoffice-env.kvus2ffkxa.eu-west-2.elasticbeanstalk.com/balances?checksum=127928282`
 
 **Response**
 ```json
 {
-	"5b158587acc5e83a84521870": {
-		"BTC": 0,
-		"USD": 1000,
-		"EUR": 20
-	},
-	"5b15871c31f02c3aa48d060d": {
-		"BTC": 0.03,
-		"USD": 100,
-		"EUR": 1
-	}
+	"checksum": -926698557,
+	"balance": [
+		[
+			"5b1108ae079f425343c715b8",
+			{
+				"BTC": 72100,
+				"USD": 1,
+				"EUR": 1
+			}
+		],
+		[
+			"5b112b79ded7f95f87f84bef",
+			{
+				"BTC": 81,
+				"USD": 1,
+				"EUR": 1
+			}
+    ]
+  ]
 }
 ```
 
-## Get Checksum of all Balances
+## Get Checksum of all Balances [DEPRECATED]
+### <Checksum will now be sent with the balance object ^^>
 **GET** `simplebackoffice-env.kvus2ffkxa.eu-west-2.elasticbeanstalk.com/balances/checksum`
 
 **Response**
