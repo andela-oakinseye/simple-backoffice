@@ -62,6 +62,9 @@ Simple backoffice server
 		"id": "5b158587acc5e83a84521870",
 		"username": "5b158587acc5e83a84521870@simplebackoffice.com",
 		"iat": 1528137095
+	},
+	"response": {
+		"code": 200
 	}
 }
 ```

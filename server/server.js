@@ -24,7 +24,7 @@ app.use(express.urlencoded({
 
 mongoose.Promise = global.Promise;
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3003;
 const MONGO_URI = process.env.MONGO_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
 const CHECKSUM_SEED = process.env.CHECKSUM_SEED;
@@ -97,13 +97,19 @@ app.get('/backend/jwtDecode', (request, response) => {
 
     return response.status(200)
       .json({
-        data
+        data,
+        response: {
+          code: 200
+        }
       });
   } catch (e) {
     return response.status(401)
       .json({
         data: {},
-        error: 'Invalid token'
+        error: 'Invalid token',
+        response: {
+          code: 401
+        }
       })
   }
 });
